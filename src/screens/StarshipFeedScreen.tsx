@@ -1,9 +1,13 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {StyleSheet, StatusBar, View, Text, FlatList, Image} from "react-native";
+import {Placeholder, PlaceholderMedia, PlaceholderLine, Fade} from "rn-placeholder";
 
-import {default as data} from "../../api/data.json";
-import {Card} from "react-native-paper";
-//import {useImage} from "../hooks/useImage";
+import {Card, TextInput} from "react-native-paper";
+import {useStarships} from "~/hooks/useStarships"
+import Header from "../components/Header";
+
+
+
 
 interface ShipProps {
     name: string;
@@ -18,6 +22,27 @@ interface RenderItemProps {
 
 
 export const StarshipFeedScreen = () => {
+    const [search, setSearch] = useState("");
+    const [ships, setShips] = useState([]);
+    const { isLoading, isError, data, refetch, isRefetching } = useStarships(search)
+
+    if (isLoading) {
+        return <Text>Loading…</Text>;
+    }
+    if (isError) {
+        return <Text>Something bad happened…</Text>;
+    }
+
+    /*if (isRefetching)
+    {
+        return <Text>poolieeng</Text>
+    }*/
+
+    const handleSearch = (search: string) => {
+        setSearch(search)
+        refetch()
+    }
+
     let renderItem = (props: RenderItemProps) => {
         const {item} = props
 
@@ -39,10 +64,27 @@ export const StarshipFeedScreen = () => {
         )
     }
     //debugger
-    console.log("coucou")
+
+
     return (
         <View style={styles.container}>
+            <Header title="Recherche"></Header>
+            <View>
+                <TextInput value={search} label="Chercher" onChangeText={search => handleSearch(search)}></TextInput>
+            </View>
             <View style={styles.headerContainer}>
+
+                {isRefetching && (
+                 <Placeholder
+                    Animation={Fade}
+                    Left={PlaceholderMedia}
+                    Right={PlaceholderMedia}
+                >
+                    <PlaceholderLine width={80} />
+                    <PlaceholderLine />
+                    <PlaceholderLine width={30} />
+                </Placeholder>
+                )}
                 <FlatList
                     data={data.results}
                     renderItem={renderItem}
@@ -56,6 +98,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: StatusBar.currentHeight || 0, // only for Android to avoid status bar overlap
+
     },
     headerContainer: {
         paddingHorizontal: 20,
