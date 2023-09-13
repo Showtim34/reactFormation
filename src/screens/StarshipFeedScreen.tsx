@@ -1,38 +1,25 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  StatusBar,
-  View,
-  Text,
-  FlatList,
-  Image,
-} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, StatusBar, View, Text, FlatList } from "react-native";
 import {
   Placeholder,
   PlaceholderMedia,
   PlaceholderLine,
   Fade,
 } from "rn-placeholder";
-import { Card, TextInput } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 
 import { Header as HeaderYolo } from "../components/Header";
 
 import { useStarships } from "~/hooks/useStarships";
-
-interface ShipProps {
-  name: string;
-  model: string;
-  crew: string;
-  hyperdrive_rating: string;
-}
+import { StarshipCard } from "~/components/StarshipCard";
+import type { StarshipCardProps } from "~/types";
 
 interface RenderItemProps {
-  item: ShipProps;
+  item: StarshipCardProps;
 }
 
 export const StarshipFeedScreen = () => {
   const [search, setSearch] = useState("");
-  const [ships, setShips] = useState([]);
   const { isLoading, isError, data, refetch, isRefetching } =
     useStarships(search);
 
@@ -48,8 +35,8 @@ export const StarshipFeedScreen = () => {
         return <Text>poolieeng</Text>
     }*/
 
-  const handleSearch = () => {
-    setSearch(search);
+  const handleSearch = (s: string) => {
+    setSearch(s);
     refetch();
   };
 
@@ -57,33 +44,28 @@ export const StarshipFeedScreen = () => {
     const { item } = props;
 
     return (
-      <Card style={styles.card}>
-        <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
-        <Text>
-          <Text style={{ fontWeight: "bold" }}>Modèle : </Text>
-          {item.model}
-        </Text>
-        <Text>
-          <Text style={{ fontWeight: "bold" }}>CREW : </Text>
-          {item.crew}
-        </Text>
-        <Text>
-          <Text style={{ fontWeight: "bold" }}>Hyper Drive : </Text>
-          {item.hyperdrive_rating}
-        </Text>
-      </Card>
+      <StarshipCard
+        name={item.name}
+        model={item.model}
+        manufacturer={item.manufacturer}
+        cost_in_credits={item.cost_in_credits}
+      />
     );
   };
-  //debugger
 
   return (
     <View style={styles.container}>
-      <HeaderYolo title="Recherche" />
-      <View>
+      <HeaderYolo title="Recherchez votre ship " />
+      <View style={{ borderRadius: 0, backgroundColor: "#eee" }}>
         <TextInput
           value={search}
           label="Chercher"
-          onChangeText={() => handleSearch(search)}
+          onChangeText={(s) => handleSearch(s)}
+          style={{
+            backgroundColor: "#eee",
+            borderRadius: 0,
+            color: "#444",
+          }}
         />
       </View>
       <View style={styles.headerContainer}>
@@ -98,8 +80,12 @@ export const StarshipFeedScreen = () => {
             <PlaceholderLine width={30} />
           </Placeholder>
         )}
-        <FlatList data={data.results} renderItem={renderItem} />
       </View>
+      <FlatList
+        data={data.results}
+        renderItem={renderItem}
+        contentContainerStyle={{ gap: 15 }}
+      />
     </View>
   );
 };
@@ -112,10 +98,5 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: 20,
     marginTop: 20,
-  },
-
-  card: {
-    padding: 15,
-    marginBottom: 10,
   },
 });

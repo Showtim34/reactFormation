@@ -1,21 +1,33 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Text, TextInput, Button } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
-import { Header } from "../components/Header";
+import { Routes } from "~/navigation/Routes";
+import { Header } from "~/components/Header";
 
 export function LoginScreen() {
   const [text, setText] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(true);
 
+  const navigation = useNavigation<any>();
+
   function toggleSecureIcon() {
     setIsVisible(!isVisible);
   }
 
+  function navigateToTerms() {
+    navigation.navigate(Routes.TERMS_SCREEN);
+  }
+
+  function navigateToShips() {
+    navigation.navigate(Routes.STARSHIP_FEED_SCREEN);
+  }
+
   return (
     <>
-      <Header title="Login Screen" />
+      <Header title="Espace hyper sécurisé" />
       <View style={styles.main}>
         <TextInput
           label="Email"
@@ -40,14 +52,16 @@ export function LoginScreen() {
         <Button
           icon="lock"
           mode="contained"
-          onPress={() => console.log("Pressed")}
-          style={[styles.marginBottom]}
+          onPress={() => navigateToShips()}
+          style={[styles.button, styles.marginBottom]}
         >
           Entre donc !
         </Button>
-        <Text variant={"labelSmall"} style={[styles.textMuted]}>
-          Si tu te logues, tu acceptes absolument tout
-        </Text>
+        <TouchableOpacity onPress={navigateToTerms}>
+          <Text variant={"labelSmall"} style={[styles.textMuted]}>
+            Si tu te logues, tu acceptes absolument tout
+          </Text>
+        </TouchableOpacity>
       </View>
     </>
   );
@@ -66,6 +80,10 @@ const styles = StyleSheet.create({
   textMuted: {
     color: "#ccc",
   },
+  button: {
+    backgroundColor: "black",
+  },
+
   marginBottom: {
     marginBottom: 15,
   },
